@@ -181,6 +181,15 @@ body {
 <!--Fim do menu-->
 <!-- Modal para exibir os detalhes do evento -->
 
+<form action="/imagem" method="POST" enctype="multipart/form-data">
+
+  <label for="imagemLogo" class="form-label visually-hidden">Logo</label>
+  <input type="file" class="form-control" id="image" name="image" accept="image/*">
+
+<button type="button" class="btn btn-primary w-100 mb-3" onclick="carregar()">Carregar Imagem</button>
+
+</form>
+
 <!-- Seção de Eventos Recomendados -->
 <section class="my-4 event-section">
   <div class="container mt-4">
