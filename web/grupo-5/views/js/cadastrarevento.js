@@ -2,7 +2,7 @@ async function postEvent(event) {
     event.preventDefault();  // Evita que o formulário seja enviado de forma tradicional
 
     const eventosEndpoint = '/eventos';  // Endpoint onde os eventos são cadastrados
-    const URLCompleta = `http://localhost:3000${eventosEndpoint}`;
+    const URLCompleta = `http://localhost:3005${eventosEndpoint}`;
 
     let nomeEventoInput = document.querySelector('#nome');
     let telefoneInput = document.querySelector('#telefone');
@@ -89,3 +89,78 @@ function exibirAlerta(seletor, innerHTML, classesToAdd, classesToRemove, timeout
         console.error("Elemento de alerta não encontrado. Verifique o seletor:", seletor);
     }
 }
+
+const GEMINI_API_KEY = 'AIzaSyCD2twcXxSqMwJfrhKWU4lE4LGyYGomLFE'; // Substitua por sua chave real
+
+async function gerarDicas(categoria, tipo_evento) {
+  try {
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+      {
+        contents: [
+          {
+            role: "user",
+            parts: [
+              {
+                text: `Instrua dicas de como estruturar um evento da categoria "${categoria}" de tipo "${tipo_evento}". Forneça somente orientações e melhores práticas. Não utilize caracteres especiais como #, **, etc, apenas faça um texto corrido, mas completo. No final, dê um exemplo de nome e uma descrição para o evento da categoria "${categoria}" de tipo "${tipo_evento}" no formato: Nome: [Nome] Descrição: [Descrição]`
+              }
+            ]
+          }
+        ]
+      },
+      {
+        headers: { "Content-Type": "application/json" }
+      }
+    );
+
+    console.log("Resposta da API:", response.data);
+
+    const dicasGeradas = response.data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+
+    return dicasGeradas || "Dicas não geradas";
+  } catch (error) {
+    console.error("Erro ao gerar dicas do evento:", error.response?.data || error.message);
+    return "";
+  }
+}
+
+// Listener do botão para Obter Dicas
+document.getElementById('btn-dicas').addEventListener('click', async () => {
+  const categoria = document.getElementById('categoria').value;
+  const tipo = document.getElementById('tipo-evento').value;
+
+  if (!categoria) {
+    alert("Por favor, selecione uma categoria antes de solicitar dicas.");
+    return;
+  }
+
+  if (!tipo) {
+    alert("Por favor, diga o tipo do evento.");
+    return;
+  }
+  
+  document.getElementById('dicasContent').innerText = "Carregando dicas...";
+  
+  const dicas = await gerarDicas(categoria, tipo);
+  
+  document.getElementById('dicasContent').innerText = dicas;
+  
+  var dicasModal = new bootstrap.Modal(document.getElementById('dicasModal'));
+  dicasModal.show();
+});
+
+document.getElementById('btn-aplicar-dicas').addEventListener('click', () => {
+    const dicasTexto = document.getElementById('dicasContent').innerText;
+  
+    const nomeMatch = dicasTexto.match(/Nome:\s*(.*)/i);
+    const descricaoMatch = dicasTexto.match(/Descrição:\s*(.*)/i);
+  
+    const nome = nomeMatch ? nomeMatch[1].trim() : "";
+    const descricao = descricaoMatch ? descricaoMatch[1].trim() : "";
+  
+    document.getElementById('nome').value = nome;
+    document.getElementById('descricao').value = descricao;
+  
+    var dicasModal = bootstrap.Modal.getInstance(document.getElementById('dicasModal'));
+    dicasModal.hide();
+  });  
