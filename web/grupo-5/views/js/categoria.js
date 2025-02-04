@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const categoriaSelecionada = localStorage.getItem('categoriaSelecionada');
     if (!categoriaSelecionada) {
         alert('Nenhuma categoria selecionada.');
-        window.location.href = 'index-05.html';
+        window.location.href = '/';
         return;
     }
 
