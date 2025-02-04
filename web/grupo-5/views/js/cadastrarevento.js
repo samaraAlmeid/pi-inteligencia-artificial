@@ -90,8 +90,7 @@ function exibirAlerta(seletor, innerHTML, classesToAdd, classesToRemove, timeout
     }
 }
 
-const GEMINI_API_KEY = 'AIzaSyCD2twcXxSqMwJfrhKWU4lE4LGyYGomLFE'; // Substitua por sua chave real
-
+const GEMINI_API_KEY = ''; // Coloque sua chave aqui
 async function gerarDicas(categoria, tipo_evento) {
   try {
     const response = await axios.post(
